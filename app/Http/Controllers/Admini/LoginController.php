@@ -11,10 +11,20 @@ class LoginController extends BaseController
         $credentials = request(['username', 'password']);
 
         if (! $token = auth('admin')->attempt($credentials)) {
-            return $this->success( ['error' => 'auth login'] , 'Authorized' ,7 );
+            return $this->success( ['error' => 'auth login'] , '帐号密码不正确' ,2 );
         }
 
-        return $this->respondWithToken($token);
+        $result['permissions'] = [['id'=> 'queryForm', 'operation'=> ['add', 'edit']]];
+        $result['roles'] = [['id'=> 'admin', 'operation'=> ['add', 'edit', 'delete']]];
+        $result['token'] = [
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => (int)(time() + auth('api')->factory()->getTTL() * 60)
+        ];
+        $result['info'] = auth('admin')->user();
+        $username = $result['info']['username'] ?? '-';
+
+        return $this->success($result,$username .'，欢迎回来');
     }
 
     public function me()

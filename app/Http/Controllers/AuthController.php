@@ -15,7 +15,7 @@ class AuthController extends BaseController
         $credentials = request(['name', 'password']);
 
         if (! $token = auth('api')->attempt($credentials)) {
-            return $this->success( ['error' => 'auth login'] , 'Authorized' ,7 );
+            return $this->success( ['error' => 'auth login'] , '帐号密码不正确' ,2 );
         }
 
         return $this->respondWithToken($token);
