@@ -18,7 +18,7 @@ class LoginController extends BaseController
         $result['roles'] = [['id'=> 'admin', 'operation'=> ['add', 'edit', 'delete']]];
         $result['token'] = [
             'token' => $token,
-            'token_type' => 'bearer',
+            'type' => 'Bearer',
             'expires_in' => (int)(time() + auth('api')->factory()->getTTL() * 60)
         ];
         $result['info'] = auth('admin')->user();
@@ -52,7 +52,7 @@ class LoginController extends BaseController
     {
         return $this->success([
             'token' => $token,
-            'token_type' => 'bearer',
+            'type' => 'Bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
     }

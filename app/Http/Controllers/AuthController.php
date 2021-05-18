@@ -46,7 +46,7 @@ class AuthController extends BaseController
     {
         return $this->success([
             'token' => $token,
-            'token_type' => 'bearer',
+            'type' => 'Bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
     }

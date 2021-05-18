@@ -13,6 +13,7 @@ class BaseController extends Controller
 
     public function success($data = [] , $msg = 'success' , $code = 1)
     {
+
         throw new SystemException($msg , $data , $code);
     }
 

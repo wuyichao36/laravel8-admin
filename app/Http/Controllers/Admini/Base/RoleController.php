@@ -1,29 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admini\Main;
+namespace App\Http\Controllers\Admini\Base;
 
-use App\Http\Controllers\Admini\CommonController;
-use App\Http\Requests\Admini\AdminRequest;
-use App\Models\Admini\Admin;
-use App\Repository\Admini\ManagerRepository;
+use App\Http\Controllers\Admini\BaseController;
+use App\Models\Admini\Role;
 use App\Repository\Admini\RoleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
-class ManagerController extends CommonController
+class RoleController extends BaseController
 {
-    //
-    protected $roleList;
-    public function __construct()
-    {
-        $this->roleList = RoleRepository::limit();
-    }
-
-    public function index()
-    {
-        return view('admini.main.manager.index');
-    }
 
     public function lists(Request $Request)
     {
@@ -31,16 +18,16 @@ class ManagerController extends CommonController
 
         $pageRows = (isset($Request->limit) && $Request->limit > 0 ) ? $Request->limit : config('constants.pageRows');
 
-        $condition = $Request->only(Admin::$searchFieldForm);
-        $data = ManagerRepository::lists($pageRows , $condition , $param);
+        $condition = $Request->only(Role::$searchFieldForm);
+        $data = RoleRepository::lists($pageRows , $condition , $param);
 
-        return $data;
+        return $this->success($data);
     }
 
     public function switch_edit(Request $Request)
     {
         try {
-            $res = ManagerRepository::switchStatus($Request->post());
+            $res = $this->roleRepository->switchStatus($Request->post());
             return [
                 'code' => $res['code'],
                 'msg' => $res['msg'],
@@ -59,25 +46,19 @@ class ManagerController extends CommonController
      */
     public function create()
     {
-        //$roleList = RoleRepository::limit();
-        return view('admini.main.manager.add' , ['roleList' => $this->roleList]);
+        return view('admini.main.role.add');
     }
 
     /**
      */
-    public function store(AdminRequest $Request)
+    public function store(RoleRequest $Request)
     {
         try {
-            $data = $Request->only(Admin::$searchFieldForm);
-            if (!isset($data['status'])) {
-                $data['status'] = 1;
-            }
-
-            ManagerRepository::add($data);
+            $this->roleRepository->addItem($Request->only(Role::$searchFieldForm) );
             return [
                 'code' => 1,
                 'msg' => '添加成功',
-                'redirect' => route('admini.manager.index')
+                'redirect' => route('admini.role.index')
             ];
         } catch (QueryException $e) {
             return [
@@ -92,31 +73,24 @@ class ManagerController extends CommonController
      */
     public function edit($id)
     {
-        $model = ManagerRepository::find($id);
-        $roleList = RoleRepository::limit();
+        $model = $this->roleRepository->find($id);
 
-        return view('admini.main.manager.add', ['id' => $id, 'model' => $model , 'roleList' => $this->roleList] );
+        return view('admini.main.role.add', ['id' => $id, 'model' => $model] );
     }
 
     /**
      */
-    public function update(AdminRequest $Request, $id)
+    public function update(RoleRequest $Request, $id)
     {
 
-        try {
-            $data = $Request->only(Admin::$searchFieldForm);
-            if (!isset($data['status'])) {
-                $data['status'] = 1;
-            }
-            if ($Request->input('password') == '') {
-                unset($data['password']);
-            }
+        $data = $Request->only(Role::$searchFieldForm);
 
-            ManagerRepository::update($id, $data);
+        try {
+            $this->roleRepository->updateItem($id, $data);
             return [
                 'code' => 1,
                 'msg' => '编辑成功',
-                'redirect' => route('admini.manager.index') .'?'. $Request->getQueryString()
+                'redirect' => route('admini.role.index') .'?'. $Request->getQueryString()
             ];
         } catch (QueryException $e) {
             return [
@@ -132,11 +106,11 @@ class ManagerController extends CommonController
     public function destroy(Request $Request,$id)
     {
         try {
-            ManagerRepository::delete($id);
+            $this->roleRepository->deleteItem($id);
             return [
                 'code' => 1,
                 'msg' => '删除成功',
-                'redirect' => route('admini.manager.index') .'?'. $Request->getQueryString()
+                'redirect' => route('admini.role.index') .'?'. $Request->getQueryString()
             ];
         } catch (\RuntimeException $e) {
             return [
