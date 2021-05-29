@@ -17,7 +17,7 @@ class ManagerController extends BaseController
     {
         $param = $Request->getQueryString();
 
-        $pageRows = (isset($Request->limit) && $Request->limit > 0 ) ? $Request->limit : config('constants.pageRows');
+        $pageRows = (isset($Request->size) && $Request->size > 0 ) ? $Request->size : config('constants.pageRows');
 
         $condition = $Request->only(Admin::$searchFieldForm);
         $data = ManagerRepository::lists($pageRows , $condition , $param);

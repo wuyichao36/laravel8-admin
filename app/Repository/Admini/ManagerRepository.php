@@ -32,7 +32,7 @@ class ManagerRepository
             unset($item->role);
             return $item;
         });
-
+        return $data;
         return [
             'count' => $data->total(),
             'data' => $data->items(),
