@@ -39,9 +39,9 @@ class ManagerRepository
         ];
     }
 
-    public static function find($id)
+    public static function find($id , $field = 'id')
     {
-        return Admin::query()->find($id);
+        return Admin::query()->where($field,$id)->first();
     }
 
     public static function switchStatus($param)
@@ -50,8 +50,7 @@ class ManagerRepository
             return ['code' => 0 , 'msg' => 'Error','data' =>[] ];
         }
 
-        $item = Admin::query()->find($param['id']);
-
+        $item = self::find( $param['id'] );
         if($param['value'] == false || $param['value'] == 'false'){
             $value = 2;
         }else{

@@ -1,7 +1,8 @@
 <?php
-
 namespace App\Models\Admini;
 
+use Illuminate\Database\Eloquent\Model as modelModel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -9,11 +10,14 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class Admin extends Authenticatable implements JWTSubject
 {
     use Notifiable;
-
+    use SoftDeletes;
     /**
      * The table associated with the model.
      */
     protected $table = 'sys_administrator';
+
+    public $timestamps = true;
+    protected $dateFormat='U';
 
     /**
      * The attributes that are mass assignable.

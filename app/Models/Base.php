@@ -11,7 +11,7 @@ class Base extends EloquentModel
 {
     use SoftDeletes;
 
-    //const DELETED_AT='deleted_at';
+    const DELETED_AT='deleted_at';
     #set the date format as timestamp
-    //protected $dateFormat='U';
+    protected $dateFormat='U';
 }

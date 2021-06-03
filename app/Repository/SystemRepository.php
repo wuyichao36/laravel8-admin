@@ -22,18 +22,18 @@ class SystemRepository
         return $sequence;
     }
 
-    public function find($id)
+    public function find($id,$model)
     {
-        return $this->publicModel::query()->find($id);
+        return $model::query()->find($id);
     }
 
-    public function switchStatus($param)
+    public function switchStatus($param,$model)
     {
         if(!isset($param['id']) || !isset($param['field'])|| !isset($param['value'])){
             return ['code' => 0 , 'msg' => 'Error','data' =>[] ];
         }
 
-        $item = $this->publicModel::query()->find($param['id']);
+        $item = $model::query()->find($param['id']);
 
         if($param['value'] == false || $param['value'] == 'false'){
             $value = 2;
@@ -54,7 +54,7 @@ class SystemRepository
             $data = [
                 $param['field'] => $value ,
             ];
-            $res = $this->publicModel::query()->where('id', $itemArr['id'])->update($data);
+            $res = $model::query()->where('id', $itemArr['id'])->update($data);
 
             if($res){
                 return ['code' => 1 , 'msg' => '修改成功！','data' => $item ];
@@ -64,18 +64,18 @@ class SystemRepository
         }
     }
 
-    public function addItem($data)
+    public function addItem($data,$model)
     {
-        return $this->publicModel::query()->create($data);
+        return $model::query()->create($data);
     }
 
-    public function updateItem($id, $data)
+    public function updateItem($id, $data,$model)
     {
-        return $this->publicModel::query()->where('id', $id)->update($data);
+        return $model::query()->where('id', $id)->update($data);
     }
 
-    public function deleteItem($id)
+    public function deleteItem($id,$model)
     {
-        return $this->publicModel::destroy($id);
+        return $model::destroy($id);
     }
 }
