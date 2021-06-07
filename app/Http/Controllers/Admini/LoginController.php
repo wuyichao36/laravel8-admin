@@ -24,7 +24,7 @@ class LoginController extends BaseController
         $result['info'] = auth('admin')->user();
         $username = $result['info']['username'] ?? '-';
 
-        //$result['info']['roles'] = $result['roles'];
+        //$result['info']['roles'] = $roles;
 
         return $this->success($result,$username .'，欢迎回来');
     }
