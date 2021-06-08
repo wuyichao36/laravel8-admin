@@ -17,8 +17,8 @@ class LoginController extends BaseController
         $result['permissions'] = [['id'=> 'queryForm', 'operation'=> ['add', 'edit']]];
         $result['roles'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         $result['token'] = [
-            'token' => $token,
-            'type' => 'Bearer ',
+            'token' => 'Bearer '. $token,
+            'type' => 'Bearer',
             'expires_in' => (int)(time() + auth('api')->factory()->getTTL() * 60)
         ];
         $result['info'] = auth('admin')->user();
