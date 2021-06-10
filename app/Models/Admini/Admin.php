@@ -1,11 +1,11 @@
 <?php
 namespace App\Models\Admini;
 
-use Illuminate\Database\Eloquent\Model as modelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use DateTimeInterface;
 
 class Admin extends Authenticatable implements JWTSubject
 {
@@ -15,9 +15,6 @@ class Admin extends Authenticatable implements JWTSubject
      * The table associated with the model.
      */
     protected $table = 'sys_administrator';
-
-    public $timestamps = true;
-    protected $dateFormat='U';
 
     /**
      * The attributes that are mass assignable.
@@ -53,22 +50,10 @@ class Admin extends Authenticatable implements JWTSubject
         return ['role' => 'admin'];
     }
 
-    public static $searchField = [
-        'username' => '用户名',
-        'status' => [
-            'showType' => 'select',
-            'searchType' => '=',
-            'title' => '状态',
-            'enums' => [
-                0 => '禁用',
-                1 => '启用',
-            ],
-        ],
-        'created_at' => [
-            'showType' => 'datetime',
-            'title' => '创建时间'
-        ]
-    ];
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 
     public static $searchFieldForm = [
         'username' ,
@@ -80,20 +65,6 @@ class Admin extends Authenticatable implements JWTSubject
         'sort' ,
         'created_at' ,
         'updated_at' ,
-    ];
-
-    public static $listField = [
-
-        'id' => ['title' => 'ID' , 'width' => 80 , 'sort' => true],
-        'username' => ['title' => '用户名' , 'minWidth' => 120],
-        'truename' => ['title' => '姓名' , 'width' => 160],
-        'role_name' => ['title' => '权限' , 'width' => 140],
-
-        'status' => ['title' => '状态' , 'width' => 100 , 'sort' => true , 'templet'=> '#switchTpl'],
-        'login_count' => ['title' => '登录次数' , 'width' => 110 , 'sort' => true],
-        'error_count' => ['title' => '错误次数' , 'width' => 110 , 'sort' => true],
-        'login_time' => ['title' => '登录时间' , 'width' => 160 , 'sort' => true],
-        'login_ip' => ['title' => '登录IP', 'width' => 140 , 'sort' => true],
     ];
 
     public function role()

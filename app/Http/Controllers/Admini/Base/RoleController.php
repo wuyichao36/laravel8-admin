@@ -27,7 +27,7 @@ class RoleController extends BaseController
     public function switch_edit(Request $Request)
     {
         try {
-            $res = $this->roleRepository->switchStatus($Request->post());
+            $res = RoleRepository::switchStatus($Request->post());
             return [
                 'code' => $res['code'],
                 'msg' => $res['msg'],

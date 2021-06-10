@@ -10,14 +10,25 @@ use Illuminate\Support\Facades\DB;
 class SystemRepository
 {
 
-    public static function sequenceAsc($condition = []){
+    public static function sequenceAsc($condition = [])
+    {
         $sequence = DB::raw('sort desc,id asc');
-
+        if( !empty($condition['orderKey']) && !empty($condition['orderBy']) ){
+            $orderBy = $condition['orderBy'] == 'normal' ? '' : ' '.$condition['orderBy'];
+            $orderKey = rtrim($condition['orderKey'],'_val');
+            $sequence = DB::raw($orderKey . $orderBy );
+        }
         return $sequence;
     }
 
-    public static function sequenceDesc($condition = []){
+    public static function sequenceDesc($condition = [])
+    {
         $sequence = DB::raw('sort desc,id desc');
+        if( !empty($condition['orderKey']) && !empty($condition['orderBy']) ){
+            $orderBy = $condition['orderBy'] == 'normal' ? '' : ' '.$condition['orderBy'];
+            $orderKey = rtrim($condition['orderKey'],'_val');
+            $sequence = DB::raw($orderKey . $orderBy );
+        }
 
         return $sequence;
     }

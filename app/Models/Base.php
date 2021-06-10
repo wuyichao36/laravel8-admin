@@ -6,12 +6,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Base extends EloquentModel
 {
     use SoftDeletes;
 
     const DELETED_AT='deleted_at';
-    #set the date format as timestamp
-    protected $dateFormat='U';
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 }

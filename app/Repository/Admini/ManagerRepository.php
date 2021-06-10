@@ -16,27 +16,25 @@ class ManagerRepository
 
     public static function lists($perPage, $condition = [] , $param = [])
     {
+        $statusValRender = config('constants.statusValRender');
+        $orderByRaw = SystemRepository::sequenceDesc($param);
         $data = Admin::query()
             ->select('id', 'username', 'truename', 'role_id', 'login_count', 'login_ip','login_time', 'error_count' , 'status', 'created_at', 'updated_at')
             ->where(function ($query) use ($condition) {
                 Searchable::buildQuery($query, $condition);
             })
             ->with('role')
-            ->orderBy('sort', 'desc')
-            ->orderBy('id', 'desc')
+            ->orderByRaw($orderByRaw)
             ->paginate($perPage);
 
-        $data->transform(function ($item) use ($param) {
+        $data->transform(function ($item) use ($param,$statusValRender) {
             xssFilter($item);
             $item->role_name = $item->role ? $item->role->title : '';
+            $item->status_val = $statusValRender[$item->status] ?? '-';
             unset($item->role);
             return $item;
         });
         return $data;
-        return [
-            'count' => $data->total(),
-            'data' => $data->items(),
-        ];
     }
 
     public static function find($id , $field = 'id')

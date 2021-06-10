@@ -30,10 +30,10 @@ Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'] ], function () {
 
     Route::group(['prefix' => 'base'], function () {
         Route::group(['prefix' => 'manager'], function () {
-            Route::post('lists', [ManagerController::class, 'lists']);
+            Route::get('lists', [ManagerController::class, 'lists']);
         });
         Route::group(['prefix' => 'role' ], function () {
-            Route::post('lists', [RoleController::class, 'lists']);
+            Route::get('lists', [RoleController::class, 'lists']);
         });
     });
 
