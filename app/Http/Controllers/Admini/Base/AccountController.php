@@ -3,37 +3,32 @@
 namespace App\Http\Controllers\Admini\Base;
 
 use App\Http\Controllers\Admini\BaseController;
-use App\Models\Admini\Role;
+use App\Models\Admini\Account;
+use App\Repository\Admini\AccountRepository;
 use App\Repository\Admini\RoleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
-class RoleController extends BaseController
+class AccountController extends BaseController
 {
-
-    public function index(Request $Request)
+    //
+    public function index(Request $request)
     {
-        $param = $Request->getQueryString();
+        $param = $request->getQueryString();
+        $pageRows = (isset($request->size) && $request->size > 0 ) ? $request->size : config('constants.pageRows');
 
-        $pageRows = (isset($Request->limit) && $Request->limit > 0 ) ? $Request->limit : config('constants.pageRows');
-
-        $condition = $Request->only(Role::$searchFieldForm);
-        $data = RoleRepository::lists($pageRows , $condition , $param);
+        $condition = $request->only(Account::$searchFieldForm);
+        $data = AccountRepository::lists($pageRows , $condition , $param);
 
         return $this->success($data);
     }
 
-    public function lists(Request $Request)
-    {
-        $data = RoleRepository::limit();
-        return $this->success($data);
-    }
-
-    public function switch_edit(Request $Request)
+    public function switch_edit(Request $request)
     {
         try {
-            $res = RoleRepository::switchStatus($Request->post());
+            $res = AccountRepository::switchStatus($request->post());
             return [
                 'code' => $res['code'],
                 'msg' => $res['msg'],
@@ -52,7 +47,7 @@ class RoleController extends BaseController
     {
         $id = $request->query('id') ?? 0;
         try {
-            $res = RoleRepository::find($id);
+            $res = AccountRepository::find($id);
             $item = [
                 'code' => 1,
                 'msg' => 'success',
@@ -69,35 +64,54 @@ class RoleController extends BaseController
         return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
-    public function store(Request $request)
+    public function store_update(Request $request)
     {
-        $data = $request->only(Role::$searchFieldForm);
+        $data = $request->only(Account::$searchFieldForm);
         $id = $request->post('id') ?? 0;
 
-        if( empty($id) ) {
+        if( empty($id) )
+        {
             try {
-                $this->roleRepository->addItem($data);
+                if (!isset($data['status']))
+                {
+                    $data['status'] = 1;
+                }
+                AccountRepository::add($data);
                 $item = [
                     'code' => 1,
                     'msg' => '添加成功',
                     'data' => []
                 ];
-            } catch (QueryException $e) {
+            } catch (QueryException $e)
+            {
                 $item = [
                     'code' => 0,
                     'msg' => '添加失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
                     'data' => []
                 ];
             }
+
         }else{
+
             try {
-                $this->roleRepository->updateItem($id, $data);
+                $data = $request->only(Account::$searchFieldForm);
+                if (!isset($data['status']))
+                {
+                    $data['status'] = 1;
+                }
+                if ($request->input('password') == '')
+                {
+                    unset($data['password']);
+                }
+                AccountRepository::update($id, $data);
+
                 $item = [
                     'code' => 1,
                     'msg' => '编辑成功',
                     'data' => []
                 ];
-            } catch (QueryException $e) {
+            } catch (QueryException $e)
+            {
                 $item = [
                     'code' => 0,
                     'msg' => '编辑失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
@@ -109,16 +123,37 @@ class RoleController extends BaseController
         return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
-    /**
-     */
-    public function destroy(Request $Request,$id)
+    public function password(Request $request)
     {
         try {
-            $this->roleRepository->deleteItem($id);
+            $data = $request->only(Account::$searchFieldForm);
+            $id = $request->post('id') ?? 0;
+
+            AccountRepository::update($id, $data);
+            $item = [
+                'code' => 1,
+                'msg' => '重置密码成功',
+                'data' => []
+            ];
+        } catch (QueryException $e) {
+            $item = [
+                'code' => 0,
+                'msg' => '重置失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '重置密码错误' : '其它错误'),
+                'data' => []
+            ];
+        }
+
+        return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
+    }
+
+    public function destroy(Request $request,$id)
+    {
+        try {
+            AccountRepository::delete($id);
             return [
                 'code' => 1,
                 'msg' => '删除成功',
-                'redirect' => route('admini.role.index') .'?'. $Request->getQueryString()
+                'redirect' => route('admini.manager.index') .'?'. $request->getQueryString()
             ];
         } catch (\RuntimeException $e) {
             return [

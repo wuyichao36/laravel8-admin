@@ -34,7 +34,7 @@ class RoleRepository extends SystemRepository
         return $data;
     }
 
-    public function limit()
+    public static function limit()
     {
         $orderByRaw = SystemRepository::sequenceAsc();
 

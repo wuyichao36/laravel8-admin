@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admini\LoginController;
-use App\Http\Controllers\Admini\Base\ManagerController;
+use App\Http\Controllers\Admini\Base\AccountController;
 use App\Http\Controllers\Admini\Base\RoleController;
 
 
@@ -29,11 +29,19 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'] ], function () {
 
     Route::group(['prefix' => 'base'], function () {
-        Route::group(['prefix' => 'manager'], function () {
-            Route::get('lists', [ManagerController::class, 'lists']);
+        Route::group(['prefix' => 'account'], function () {
+            Route::get('index', [AccountController::class, 'index']);
+            Route::get('show', [AccountController::class, 'show']);
+            Route::post('store_update', [AccountController::class, 'store_update']);
+            Route::post('destroy', [AccountController::class, 'destroy']);
+            Route::post('password', [AccountController::class, 'password']);
         });
         Route::group(['prefix' => 'role' ], function () {
+            Route::get('index', [RoleController::class, 'index']);
+            Route::get('show', [RoleController::class, 'show']);
+            Route::post('store_update', [RoleController::class, 'store_update']);
             Route::get('lists', [RoleController::class, 'lists']);
+            Route::post('destroy', [RoleController::class, 'destroy']);
         });
     });
 

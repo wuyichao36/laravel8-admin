@@ -7,21 +7,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use DateTimeInterface;
 
-class Admin extends Authenticatable implements JWTSubject
+class Account extends Authenticatable implements JWTSubject
 {
     use Notifiable;
     use SoftDeletes;
     /**
      * The table associated with the model.
      */
-    protected $table = 'sys_administrator';
+    protected $table = 'sys_account';
 
     /**
      * The attributes that are mass assignable.
      * @var array
      */
     protected $fillable = [
-        'username', 'password',
+        'account', 'password','truename','role_id', 'mobile','email',  'intro', 'status', 'error_count','sort','created_at', 'updated_at',
     ];
 
     /**
@@ -56,15 +56,18 @@ class Admin extends Authenticatable implements JWTSubject
     }
 
     public static $searchFieldForm = [
-        'username' ,
-        'truename' ,
-        'password' ,
-        'role_id' ,
-        'status' ,
-        'error_count' ,
-        'sort' ,
-        'created_at' ,
-        'updated_at' ,
+        'account',
+        'truename',
+        'password',
+        'role_id',
+        'mobile',
+        'email',
+        'intro',
+        'status',
+        'error_count',
+        'sort',
+        'created_at',
+        'updated_at',
     ];
 
     public function role()

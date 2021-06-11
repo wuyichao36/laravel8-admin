@@ -5,12 +5,12 @@
 
 namespace App\Repository\Admini;
 
+use App\Models\Admini\Account;
 use Illuminate\Http\Request;
-use App\Models\Admini\Admin;
 use App\Repository\SystemRepository;
 use App\Repository\Searchable;
 
-class ManagerRepository
+class AccountRepository
 {
     use Searchable;
 
@@ -18,8 +18,8 @@ class ManagerRepository
     {
         $statusValRender = config('constants.statusValRender');
         $orderByRaw = SystemRepository::sequenceDesc($param);
-        $data = Admin::query()
-            ->select('id', 'username', 'truename', 'role_id', 'login_count', 'login_ip','login_time', 'error_count' , 'status', 'created_at', 'updated_at')
+        $data = Account::query()
+            ->select('id', 'account', 'truename', 'role_id', 'login_count', 'login_ip','login_time', 'error_count' , 'status', 'created_at', 'updated_at')
             ->where(function ($query) use ($condition) {
                 Searchable::buildQuery($query, $condition);
             })
@@ -39,7 +39,7 @@ class ManagerRepository
 
     public static function find($id , $field = 'id')
     {
-        return Admin::query()->where($field,$id)->first();
+        return Account::query()->where($field,$id)->first();
     }
 
     public static function switchStatus($param)
@@ -68,7 +68,7 @@ class ManagerRepository
             $data = [
                 $param['field'] => $value ,
             ];
-            $res = Admin::query()->where('id', $itemArr['id'])->update($data);
+            $res = Account::query()->where('id', $itemArr['id'])->update($data);
 
             if($res){
                 return ['code' => 1 , 'msg' => '修改成功！','data' => $item ];
@@ -81,21 +81,21 @@ class ManagerRepository
     public static function add($data)
     {
         $data['password'] = bcrypt($data['password']);
-        return Admin::query()->create($data);
+        return Account::query()->create($data);
     }
 
     public static function update($id, $data)
     {
-        if (isset($data['password'])) {
+        if (isset($data['password']) && $data['password']) {
             $data['password'] = bcrypt($data['password']);
         }
 
-        return Admin::query()->where('id', $id)->update($data);
+        return Account::query()->where('id', $id)->update($data);
     }
 
     public static function delete($id)
     {
-        return Admin::destroy($id);
+        return Account::destroy($id);
     }
 
 }

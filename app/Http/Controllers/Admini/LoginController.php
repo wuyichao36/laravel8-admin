@@ -8,7 +8,7 @@ class LoginController extends BaseController
 
     public function login()
     {
-        $credentials = request(['username', 'password']);
+        $credentials = request(['account', 'password']);
 
         if (! $token = auth('admin')->attempt($credentials)) {
             return $this->success( ['error' => 'auth login'] , '帐号密码不正确' ,2 );
@@ -22,7 +22,7 @@ class LoginController extends BaseController
             'expires_in' => (int)(time() + auth('api')->factory()->getTTL() * 60)
         ];
         $result['info'] = auth('admin')->user();
-        $username = $result['info']['username'] ?? '-';
+        $username = $result['info']['account'] ?? '-';
 
         //$result['info']['roles'] = $roles;
 
