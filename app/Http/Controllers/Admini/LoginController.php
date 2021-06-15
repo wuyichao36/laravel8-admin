@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Admini;
 use App\Exceptions\SystemException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends BaseController
 {
 
-    public function login()
+    public function login(Request $request)
     {
-        $credentials = request(['account', 'password']);
-
+        $credentials = $request->json()->all();//request(['account', 'password']);
+        Log::info('login - ', [ 'path' => $request->path() , 'data' => $request->json()->all() ]);
         if (! $token = auth('admin')->attempt($credentials)) {
             return $this->success( ['error' => 'auth login'] , '帐号密码不正确' ,2 );
         }

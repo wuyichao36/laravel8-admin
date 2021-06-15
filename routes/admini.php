@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admini\LoginController;
 use App\Http\Controllers\Admini\Base\AccountController;
 use App\Http\Controllers\Admini\Base\RoleController;
+use App\Http\Controllers\Admini\Base\MenuController;
 
 
 /*
@@ -43,6 +44,11 @@ Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'] ], function () {
             Route::get('lists', [RoleController::class, 'lists']);
             Route::post('destroy', [RoleController::class, 'destroy']);
         });
+
+        Route::group(['prefix' => 'menu' ], function () {
+            Route::get('load_tree', [MenuController::class, 'load_tree']);
+        });
+
     });
 
 

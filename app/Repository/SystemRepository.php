@@ -33,7 +33,7 @@ class SystemRepository
         return $sequence;
     }
 
-    public function find($id,$model)
+    public static function find($id,$model)
     {
         return $model::query()->find($id);
     }

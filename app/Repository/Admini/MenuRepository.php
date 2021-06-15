@@ -8,18 +8,9 @@ namespace App\Repository\Admini;
 use App\Models\Admini\Menu;
 use App\Repository\SystemRepository;
 use App\Repository\Searchable;
-use Illuminate\Support\Facades\DB;
 
-class MenuRepository extends SystemRepository
+class MenuRepository
 {
-    use Searchable;
-
-    protected $publicModel;
-    public function __construct(Menu $menu)
-    {
-        $this->publicModel = $menu;
-    }
-
     public function lists($perPage, $condition = [])
     {
 
@@ -48,15 +39,9 @@ class MenuRepository extends SystemRepository
         ];
     }
 
-    public function getTree()
+    public static function getTree()
     {
-        $data = $this->publicModel::query()
-            ->select('id' , 'title as name' , 'parent_id' , 'sort' , 'status', 'updated_at' )
-            ->where('type' , '!=' , 2 )
-            ->orderByRaw( SystemRepository::sequenceAsc() )
-            ->get();
-
-        return getGenerateTree($data->toArray());
+        return Menu::with('allChildrenCategorys')->get();
     }
 
 

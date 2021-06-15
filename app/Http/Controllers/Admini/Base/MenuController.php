@@ -26,22 +26,22 @@ class MenuController extends CommonController
         return view('admini.main.menu.index');
     }
 
-    public function lists(Request $Request)
+    public function lists(Request $request)
     {
-        $param = $Request->getQueryString();
-        $pageRows = (isset($Request->limit) && $Request->limit > 0 ) ? $Request->limit : config('constants.pageRows');
+        $param = $request->getQueryString();
+        $pageRows = (isset($request->limit) && $request->limit > 0 ) ? $request->limit : config('constants.pageRows');
 
-        $condition = $Request->only(Menu::$searchFieldForm);
+        $condition = $request->only(Menu::$requestForm);
         $data = $this->menuRepository->lists($pageRows , $condition , $param);
 
         //return view('admini.main.menu.index');
         return $data;
     }
 
-    public function switch_edit(Request $Request)
+    public function switch_edit(Request $request)
     {
         try {
-            $res = $this->menuRepository->switchStatus($Request->post());
+            $res = $this->menuRepository->switchStatus($request->post());
             return [
                 'code' => $res['code'],
                 'msg' => $res['msg'],
@@ -56,15 +56,11 @@ class MenuController extends CommonController
         }
     }
 
-    public function load_tree(Request $Request)
+    public function load_tree(Request $request)
     {
-        try {
-            $result = $this->menuRepository->getTree();
-            return $result;
-        } catch (QueryException $e) {
+        $result = MenuRepository::getTree();
 
-            return [["id"=>0,"name"=>"根目录","parent_id"=>0,"open"=>false,"checked"=>true]];
-        }
+        return $this->success($result);
     }
 
     public function icon()
@@ -74,11 +70,11 @@ class MenuController extends CommonController
 
     /**
      */
-    public function create(Request $Request)
+    public function create(Request $request)
     {
         $model = (object)[
-            'parent_id' => $Request->id ?? 0,
-            'type' => $Request->menu ?? 0,
+            'parent_id' => $request->id ?? 0,
+            'type' => $request->menu ?? 0,
         ];
 
         return view('admini.main.menu.add', ['model' => $model,] );
@@ -86,10 +82,10 @@ class MenuController extends CommonController
 
     /**
      */
-    public function store(MenuRequest $Request)
+    public function store(MenuRequest $request)
     {
         try {
-            $data = $Request->only(Menu::$searchFieldForm);
+            $data = $request->only(Menu::$requestForm);
             if (!isset($data['status'])) {
                 $data['status'] = 1;
             }
@@ -120,10 +116,10 @@ class MenuController extends CommonController
 
     /**
      */
-    public function update(MenuRequest $Request, $id)
+    public function update(MenuRequest $request, $id)
     {
         try {
-            $data = $Request->only(Menu::$searchFieldForm);
+            $data = $request->only(Menu::$requestForm);
             if (!isset($data['status'])) {
                 $data['status'] = 1;
             }
@@ -131,7 +127,7 @@ class MenuController extends CommonController
             return [
                 'code' => 1,
                 'msg' => '编辑成功',
-                'redirect' => route('admini.menu.index') .'?'. $Request->getQueryString()
+                'redirect' => route('admini.menu.index') .'?'. $request->getQueryString()
             ];
         } catch (QueryException $e) {
             return [
@@ -144,7 +140,7 @@ class MenuController extends CommonController
 
     /**
      */
-    public function destroy(Request $Request,$id)
+    public function destroy(Request $request,$id)
     {
         sleep(500);
         exit;
@@ -153,7 +149,7 @@ class MenuController extends CommonController
             return [
                 'code' => 1,
                 'msg' => '删除成功',
-                'redirect' => route('admini.menu.index') .'?'. $Request->getQueryString()
+                'redirect' => route('admini.menu.index') .'?'. $request->getQueryString()
             ];
         } catch (\RuntimeException $e) {
             return [

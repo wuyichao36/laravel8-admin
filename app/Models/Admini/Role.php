@@ -10,6 +10,10 @@ class Role extends BaseModel
 {
     protected $table = 'sys_role';
 
+    protected $fillable = [
+        'title', 'intro','status','sort','created_at', 'updated_at',
+    ];
+
     public static $searchFieldForm = [
         'title' ,
         'intro' ,

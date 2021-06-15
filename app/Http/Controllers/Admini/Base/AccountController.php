@@ -25,24 +25,6 @@ class AccountController extends BaseController
         return $this->success($data);
     }
 
-    public function switch_edit(Request $request)
-    {
-        try {
-            $res = AccountRepository::switchStatus($request->post());
-            return [
-                'code' => $res['code'],
-                'msg' => $res['msg'],
-                'redirect' => []
-            ];
-        } catch (QueryException $e) {
-            return [
-                'code' => 0,
-                'msg' => '修改失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
-                'redirect' => []
-            ];
-        }
-    }
-
     public function show(Request $request)
     {
         $id = $request->query('id') ?? 0;
@@ -60,7 +42,6 @@ class AccountController extends BaseController
                 'data' => []
             ];
         }
-
         return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
@@ -68,7 +49,6 @@ class AccountController extends BaseController
     {
         $data = $request->only(Account::$searchFieldForm);
         $id = $request->post('id') ?? 0;
-
         if( empty($id) )
         {
             try {
@@ -82,24 +62,20 @@ class AccountController extends BaseController
                     'msg' => '添加成功',
                     'data' => []
                 ];
-            } catch (QueryException $e)
-            {
+            } catch (QueryException $e) {
                 $item = [
                     'code' => 0,
                     'msg' => '添加失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
                     'data' => []
                 ];
             }
-
         }else{
-
             try {
-                $data = $request->only(Account::$searchFieldForm);
-                if (!isset($data['status']))
+                if ( !isset($data['status']) )
                 {
                     $data['status'] = 1;
                 }
-                if ($request->input('password') == '')
+                if ( empty($data['password']) )
                 {
                     unset($data['password']);
                 }
@@ -110,8 +86,7 @@ class AccountController extends BaseController
                     'msg' => '编辑成功',
                     'data' => []
                 ];
-            } catch (QueryException $e)
-            {
+            } catch (QueryException $e) {
                 $item = [
                     'code' => 0,
                     'msg' => '编辑失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
@@ -119,7 +94,6 @@ class AccountController extends BaseController
                 ];
             }
         }
-
         return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
@@ -146,22 +120,25 @@ class AccountController extends BaseController
         return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request)
     {
+        $id = $request->post('id') ?? 0;
         try {
-            AccountRepository::delete($id);
-            return [
+            AccountRepository::delete( json_decode($id) );
+            $item = [
                 'code' => 1,
                 'msg' => '删除成功',
-                'redirect' => route('admini.manager.index') .'?'. $request->getQueryString()
+                'redirect' => []
             ];
-        } catch (\RuntimeException $e) {
-            return [
+        } catch (QueryException $e) {
+            $item = [
                 'code' => 0,
                 'msg' => '删除失败：' . $e->getMessage(),
-                'redirect' => false
+                'redirect' => []
             ];
         }
+
+        return $this->success($item['data'] ?? [] , $item['msg'] ?? '其它错误' , $item['code'] ?? 0 );
     }
 
 

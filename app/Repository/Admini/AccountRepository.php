@@ -20,8 +20,11 @@ class AccountRepository
         $orderByRaw = SystemRepository::sequenceDesc($param);
         $data = Account::query()
             ->select('id', 'account', 'truename', 'role_id', 'login_count', 'login_ip','login_time', 'error_count' , 'status', 'created_at', 'updated_at')
-            ->where(function ($query) use ($condition) {
-                Searchable::buildQuery($query, $condition);
+            ->when(!empty($condition['account']) , function ($query) use ($condition)  {
+                return $query->where('account' , 'like' , '%'.$condition['account'].'%' );
+            })
+            ->when(!empty($condition['status']) , function ($query) use ($condition)  {
+                return $query->where('status' , $condition['status'] );
             })
             ->with('role')
             ->orderByRaw($orderByRaw)
