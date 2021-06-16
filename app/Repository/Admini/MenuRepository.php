@@ -41,7 +41,7 @@ class MenuRepository
 
     public static function getTree()
     {
-        return Menu::with('allChildrenCategorys')->get();
+        return Menu::with('children')->where('parent_id',0)->where('status' , 1)->get();
     }
 
 

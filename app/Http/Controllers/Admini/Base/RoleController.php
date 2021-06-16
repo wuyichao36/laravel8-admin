@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admini\Base;
 use App\Http\Controllers\Admini\BaseController;
 use App\Models\Admini\Role;
 use App\Repository\Admini\RoleRepository;
+use App\Services\Admini\MenuService;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
@@ -29,11 +30,13 @@ class RoleController extends BaseController
         return $this->success($data);
     }
 
-    public function show(Request $request)
+    public function show(Request $request,MenuService $menuService)
     {
         $id = $request->query('id') ?? 0;
         try {
             $res = RoleRepository::find($id);
+            $res['node_info'] = $menuService->nodeInfo($id);
+
             $item = [
                 'code' => 1,
                 'msg' => 'success',
@@ -54,6 +57,12 @@ class RoleController extends BaseController
     {
         $data = $request->only(Role::$searchFieldForm);
         $id = $request->post('id') ?? 0;
+
+        $params = $request->json()->all();
+
+        $node_ids = !empty($params['node_info']) ? $params['node_info'] : [];
+        $data['node_ids'] = json_encode($node_ids);
+
         if( empty($id) )
         {
             try {

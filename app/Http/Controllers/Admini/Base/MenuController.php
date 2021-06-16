@@ -2,31 +2,18 @@
 
 namespace App\Http\Controllers\Admini\Base;
 
-use App\Http\Controllers\Admini\CommonController;
-use App\Http\Requests\Admini\MenuRequest;
+use App\Http\Controllers\Admini\BaseController;
 use App\Models\Admini\Menu;
 use App\Repository\Admini\MenuRepository;
+use App\Services\Admini\MenuService;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
-class MenuController extends CommonController
+class MenuController extends BaseController
 {
-    protected $menuRepository;
-    public function __construct(MenuRepository $menuRepository)
-    {
-        $this->menuRepository = $menuRepository;
-
-        parent::__construct();
-    }
-
     //
-    public function index()
-    {
-        return view('admini.main.menu.index');
-    }
-
-    public function lists(Request $request)
+    public function index(Request $request)
     {
         $param = $request->getQueryString();
         $pageRows = (isset($request->limit) && $request->limit > 0 ) ? $request->limit : config('constants.pageRows');
@@ -38,46 +25,12 @@ class MenuController extends CommonController
         return $data;
     }
 
-    public function switch_edit(Request $request)
+    public function load_tree(Request $request,MenuService $menuService)
     {
-        try {
-            $res = $this->menuRepository->switchStatus($request->post());
-            return [
-                'code' => $res['code'],
-                'msg' => $res['msg'],
-                'redirect' => []
-            ];
-        } catch (QueryException $e) {
-            return [
-                'code' => 0,
-                'msg' => '修改失败：' . (Str::contains($e->getMessage(), 'Duplicate entry') ? '当前记录已存在' : '其它错误'),
-                'redirect' => []
-            ];
-        }
-    }
-
-    public function load_tree(Request $request)
-    {
-        $result = MenuRepository::getTree();
+        $id = $request->query('id') ?? 0;
+        $result = $menuService->nodeInfo($id);
 
         return $this->success($result);
-    }
-
-    public function icon()
-    {
-        return view('admini.main.menu.icon');
-    }
-
-    /**
-     */
-    public function create(Request $request)
-    {
-        $model = (object)[
-            'parent_id' => $request->id ?? 0,
-            'type' => $request->menu ?? 0,
-        ];
-
-        return view('admini.main.menu.add', ['model' => $model,] );
     }
 
     /**
@@ -103,15 +56,6 @@ class MenuController extends CommonController
                 'redirect' => false
             ];
         }
-    }
-
-    /**
-     */
-    public function edit($id)
-    {
-        $model = $this->menuRepository->find($id);
-
-        return view('admini.main.menu.add', ['id' => $id, 'model' => $model] );
     }
 
     /**

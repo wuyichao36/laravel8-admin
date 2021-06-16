@@ -11,7 +11,6 @@ class LoginController extends BaseController
     public function login(Request $request)
     {
         $credentials = $request->json()->all();//request(['account', 'password']);
-        Log::info('login - ', [ 'path' => $request->path() , 'data' => $request->json()->all() ]);
         if (! $token = auth('admin')->attempt($credentials)) {
             return $this->success( ['error' => 'auth login'] , '帐号密码不正确' ,2 );
         }

@@ -41,9 +41,9 @@ class Menu extends BaseModel
         return $this->hasMany(Menu::class, 'parent_id', 'id');
     }
 
-    public function allChildrenCategorys()
+    public function children()
     {
-        return $this->childCategory()->with('allChildrenCategorys');
+        return $this->childCategory()->with('children');
     }
 
 }
