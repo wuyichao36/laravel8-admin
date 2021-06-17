@@ -63,6 +63,8 @@ class RoleController extends BaseController
         $node_ids = !empty($params['node_info']) ? $params['node_info'] : [];
         $data['node_ids'] = json_encode($node_ids);
 
+        $data['operator_id'] = auth('admin')->user()->id ?? 0;
+
         if( empty($id) )
         {
             try {

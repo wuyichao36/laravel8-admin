@@ -17,7 +17,7 @@ class MenuService
         $node_ids = [];
         if( !empty($id) ){
             $role = RoleRepository::find($id);
-            $node_ids = $role && !empty($role['node_ids']) && $role['node_ids'] <> '[]' ? json_decode($role['node_ids'],true) : [];
+            $node_ids = $role && !empty($role['node_ids']) && ($role['node_ids'] <> '[]' || $role['node_ids'] <> '"[]"') ? json_decode($role['node_ids'],true) : [];
         }
         Log::info('nodeInfo - '. json_encode($node_ids) );
         return self::recursionNode($menu,$node_ids);
@@ -25,26 +25,25 @@ class MenuService
 
     public static function recursionNode($menu,$node_ids)
     {
-
         foreach($menu as &$v){
             $v['checked'] = 0;
             if($v['children']){
                 foreach($v['children'] as $kk=>&$vv){
                     $vv['checked'] = 0;
-                    if($node_ids && in_array($vv['id'],$node_ids)){
-                        $v['checked'] = $vv['checked'] = 1;
+                    if($node_ids && is_array($node_ids) && in_array($vv['id'],$node_ids)){
+                        $vv['checked'] = 1;
                     }
                     if($vv['children']){
                         foreach($vv['children'] as &$s){
                             $s['checked'] = 0;
-                            if($node_ids && in_array($s['id'],$node_ids)){
-                                $v['checked'] = $vv['checked'] = $s['checked'] = 1;
+                            if($node_ids && is_array($node_ids) && in_array($s['id'],$node_ids)){
+                                $s['checked'] = 1;
                             }
                             if(isset($s['children'])){
                                 foreach($s['children'] as &$nn){
                                     $nn['checked'] = 0;
-                                    if($node_ids && in_array($nn['id'],$node_ids)){
-                                        $v['checked'] = $vv['checked'] = $s['checked'] = $nn['checked'] = 1;
+                                    if($node_ids && is_array($node_ids) && in_array($nn['id'],$node_ids)){
+                                        $nn['checked'] = 1;
                                     }
                                 }
                                 unset($nn);
